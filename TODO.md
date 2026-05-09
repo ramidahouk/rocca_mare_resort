@@ -8,6 +8,7 @@
 - [x] `globals.css` — all design tokens, utility classes, button styles
 - [x] `layout.tsx` — fonts wired, GSAPInit mounted
 - [x] Page stubs — home, rooms, experience, gallery, contact
+- [ ] Static export config in `next.config.ts` (`output: "export"`) before deployment
 
 ---
 
@@ -41,9 +42,9 @@
 - [x] tidescape fetched — tone, section rhythm, CTA style confirmed
 - [x] Hero spec locked from Brief.md (8-point element order), DESIGN.md (motion map, tokens), zoom-parallax repo (implementation pattern)
 - [x] GSAP `pin: true` (not CSS sticky) — correct approach per GSAP docs
-- [x] Full-bleed video — `minWidth/minHeight` centering, no `object-fit`
-- [x] Dark overlay `rgba(5,10,48,0.45)`
-- [x] Headline — Recoleta 400, `clamp(4rem, 10vw, 9rem)`, tracking `-0.03em`, warm-white
+- [x] Full-bleed video - native `object-fit: cover` after re-encoding the source without baked-in black side bars
+- [x] Dark overlay `rgba(5,10,48,0.25)` for clearer video visibility
+- [x] Headline - Recoleta 400, height-aware responsive clamp, tracking `-0.03em`, warm-white
 - [x] Sub-label — DM Sans 300, one line, warm-white
 - [x] CTA — "Discover" pill, navy bg, warm-white text
 - [x] Scroll indicator — fades on scroll via scrub
@@ -55,11 +56,15 @@
   - **Tried 4:** `position: sticky` with `200vh` outer wrapper — GSAP docs explicitly say don't use CSS sticky with ScrollTrigger. Switched to `pin: true`.
   - **Tried 5:** `minWidth: 100%; minHeight: 100%; width: auto; height: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)` — covers most cases but still fails on very wide viewports narrower than the video's 16:9 ratio.
   - **Tried 6:** Starting GSAP scale at `1.15` instead of `1` to always be oversized — hides the problem but wrong per spec (`scale(1)` → `scale(1.15)` is the defined effect). Also does not fix the pre-GSAP flash on refresh.
-  - **What's needed:** A solution that guarantees the video covers the full container at any viewport aspect ratio from the very first paint, before any JS runs. Likely involves CSS only — possibly `vw`/`vh` units with `calc()` to force the video to always be oversized in both dimensions. Assign to Codex.
+  - **Final approach:** Re-encode the video source so `object-fit: cover` has clean 16:9 frames to cover with from first paint.
 
 ### Remaining sections
-- [ ] Intro text — staggered line reveal (GSAP, 0.1s stagger per line)
-- [ ] Rooms teaser
+- [x] Intro text — split layout (image bleed left, text right), clip-path stagger + image parallax
+- [x] Current placeholder images via picsum — replace with real assets later
+- [x] Rooms teaser — 3-card grid, image + label + descriptor, hover lift + scale, clip-path stagger reveal
+- [x] Rooms teaser — per-card hover tints whole section background (beige / wave / navy), 0.8s premium easing
+- [x] Rooms teaser — hovered/focused card stays full color while sibling cards dim and desaturate
+- [ ] Sync nav background tint with HomeRooms hover state (via CSS variable on `<html>`)
 - [ ] Experience teaser
 - [ ] Gallery teaser
 - [ ] CTA section (Framer Motion whileInView)

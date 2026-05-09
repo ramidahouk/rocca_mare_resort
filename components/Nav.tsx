@@ -47,20 +47,20 @@ export default function Nav() {
     <>
       <nav
         ref={navRef}
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-[600ms] ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-600 ${
           isFilled
-            ? "bg-[rgba(250,247,242,0.92)] backdrop-blur-[12px] shadow-[0_1px_0_rgba(5,10,48,0.06)]"
+            ? "bg-[rgba(250,247,242,0.92)] backdrop-blur-md shadow-[0_1px_0_rgba(5,10,48,0.06)]"
             : "bg-transparent"
         }`}
         style={{
           transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
         }}
       >
-        <div className="container flex items-center justify-between h-[72px] md:h-[88px]">
+        <div className="flex h-18 items-center justify-between md:h-22" style={{ paddingInline: "clamp(1.5rem, 4vw, 4rem)" }}>
           <Link
             href="/"
-            className={`type-heading transition-colors duration-[600ms] ${
-              isFilled ? "text-[#050A30]" : "text-[#FAF7F2]"
+            className={`type-heading transition-colors duration-600 ${
+              isFilled ? "text-navy" : "text-warm-white"
             }`}
             style={{
               fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
@@ -76,8 +76,8 @@ export default function Nav() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`type-label nav-link transition-colors duration-[600ms] ${
-                      isFilled ? "text-[#050A30]" : "text-[#FAF7F2]"
+                    className={`type-label nav-link transition-colors duration-600 ${
+                      isFilled ? "text-navy" : "text-warm-white"
                     }`}
                     style={{
                       transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
@@ -99,22 +99,22 @@ export default function Nav() {
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden flex flex-col gap-[6px] w-8 h-8 items-center justify-center transition-colors duration-[600ms] ${
-              isFilled || isMenuOpen ? "text-[#050A30]" : "text-[#FAF7F2]"
+            className={`flex h-8 w-8 flex-col items-center justify-center gap-1.5 transition-colors duration-600 md:hidden ${
+              isFilled || isMenuOpen ? "text-navy" : "text-warm-white"
             }`}
             style={{
               transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
             }}
           >
             <span
-              className="block w-6 h-px bg-current transition-transform duration-[300ms]"
+              className="block h-px w-6 bg-current transition-transform duration-300"
               style={{
                 transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
                 transform: isMenuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
               }}
             />
             <span
-              className="block w-6 h-px bg-current transition-transform duration-[300ms]"
+              className="block h-px w-6 bg-current transition-transform duration-300"
               style={{
                 transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
                 transform: isMenuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
@@ -125,7 +125,7 @@ export default function Nav() {
       </nav>
 
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-[600ms] ${
+        className={`fixed inset-0 z-40 transition-opacity duration-600 md:hidden ${
           isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{
@@ -133,7 +133,7 @@ export default function Nav() {
           transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
         }}
       >
-        <div className="container flex flex-col justify-center h-full pt-[72px]">
+        <div className="flex flex-col justify-center h-full pt-18" style={{ paddingInline: "clamp(1.5rem, 4vw, 4rem)" }}>
           <ul className="flex flex-col gap-8">
             {NAV_LINKS.map((link, i) => (
               <li
@@ -151,7 +151,7 @@ export default function Nav() {
                 <Link
                   href={link.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="type-display block text-[#050A30]"
+                  className="type-display block text-navy"
                   style={{ fontSize: "clamp(2.5rem, 8vw, 4rem)" }}
                 >
                   {link.label}
