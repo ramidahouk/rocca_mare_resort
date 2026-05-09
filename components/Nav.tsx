@@ -1,0 +1,183 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const NAV_LINKS = [
+  { href: "/rooms", label: "Rooms" },
+  { href: "/experience", label: "Experience" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/contact", label: "Contact" },
+];
+
+export default function Nav() {
+  const navRef = useRef<HTMLElement>(null);
+  const [isFilled, setIsFilled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!navRef.current) return;
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        start: () => window.innerHeight * 0.15,
+        end: "max",
+        onEnter: () => setIsFilled(true),
+        onLeaveBack: () => setIsFilled(false),
+      });
+    }, navRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
+
+  return (
+    <>
+      <nav
+        ref={navRef}
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-[600ms] ${
+          isFilled
+            ? "bg-[rgba(250,247,242,0.92)] backdrop-blur-[12px] shadow-[0_1px_0_rgba(5,10,48,0.06)]"
+            : "bg-transparent"
+        }`}
+        style={{
+          transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+        }}
+      >
+        <div className="container flex items-center justify-between h-[72px] md:h-[88px]">
+          <Link
+            href="/"
+            className={`type-heading transition-colors duration-[600ms] ${
+              isFilled ? "text-[#050A30]" : "text-[#FAF7F2]"
+            }`}
+            style={{
+              fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
+              transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+            }}
+          >
+            Rocca Mare
+          </Link>
+
+          <div className="hidden md:flex items-center gap-10">
+            <ul className="flex items-center gap-8">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`type-label nav-link transition-colors duration-[600ms] ${
+                      isFilled ? "text-[#050A30]" : "text-[#FAF7F2]"
+                    }`}
+                    style={{
+                      transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <Link href="/contact" className="btn-primary">
+              Reserve
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={`md:hidden flex flex-col gap-[6px] w-8 h-8 items-center justify-center transition-colors duration-[600ms] ${
+              isFilled || isMenuOpen ? "text-[#050A30]" : "text-[#FAF7F2]"
+            }`}
+            style={{
+              transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+            }}
+          >
+            <span
+              className="block w-6 h-px bg-current transition-transform duration-[300ms]"
+              style={{
+                transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+                transform: isMenuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              className="block w-6 h-px bg-current transition-transform duration-[300ms]"
+              style={{
+                transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+                transform: isMenuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
+              }}
+            />
+          </button>
+        </div>
+      </nav>
+
+      <div
+        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-[600ms] ${
+          isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        style={{
+          backgroundColor: "#FAF7F2",
+          transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+        }}
+      >
+        <div className="container flex flex-col justify-center h-full pt-[72px]">
+          <ul className="flex flex-col gap-8">
+            {NAV_LINKS.map((link, i) => (
+              <li
+                key={link.href}
+                style={{
+                  transform: isMenuOpen ? "translateY(0)" : "translateY(20px)",
+                  opacity: isMenuOpen ? 1 : 0,
+                  transition: `transform 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                    isMenuOpen ? 100 + i * 80 : 0
+                  }ms, opacity 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                    isMenuOpen ? 100 + i * 80 : 0
+                  }ms`,
+                }}
+              >
+                <Link
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="type-display block text-[#050A30]"
+                  style={{ fontSize: "clamp(2.5rem, 8vw, 4rem)" }}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <Link
+            href="/contact"
+            onClick={() => setIsMenuOpen(false)}
+            className="btn-primary mt-12 self-start"
+            style={{
+              transform: isMenuOpen ? "translateY(0)" : "translateY(20px)",
+              opacity: isMenuOpen ? 1 : 0,
+              transition: `transform 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                isMenuOpen ? 100 + NAV_LINKS.length * 80 : 0
+              }ms, opacity 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                isMenuOpen ? 100 + NAV_LINKS.length * 80 : 0
+              }ms`,
+            }}
+          >
+            Reserve
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}
