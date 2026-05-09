@@ -90,7 +90,7 @@ export default function HomeIntro() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imageRef}
-            src="https://picsum.photos/800/1000?random=21"
+            src="/images/intro-bleed.webp"
             alt="A quiet stone terrace overlooking the sea at Rocca Mare"
             className="home-intro-image"
             loading="lazy"

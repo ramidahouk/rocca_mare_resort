@@ -60,15 +60,16 @@
 
 ### Remaining sections
 - [x] Intro text — split layout (image bleed left, text right), clip-path stagger + image parallax
-- [x] Current placeholder images via picsum — replace with real assets later
+- [x] Intro bleed image — replaced Picsum with local optimized `public/images/intro-bleed.webp` (~432 KB)
+- [x] Current remaining placeholder images via picsum — replace with real assets later
 - [x] Rooms teaser — 3-card grid, image + label + descriptor, hover lift + scale, clip-path stagger reveal
 - [x] Rooms teaser — per-card hover tints whole section background (beige / wave / navy), 0.8s premium easing
-- [x] Rooms teaser — hovered/focused card stays full color while sibling cards dim and desaturate
-- [ ] Sync nav background tint with HomeRooms hover state (via CSS variable on `<html>`)
-- [ ] Experience teaser
+- [x] Rooms teaser — hovered/focused card stays full color while sibling cards softly dim and desaturate
+- [x] Experience teaser - full-bleed Pool / Beach / Dining image columns with hover expansion/compression
+- [x] Experience teaser - removed image zoom so column expansion is the sole signature hover effect
 - [ ] Gallery teaser
 - [ ] CTA section (Framer Motion whileInView)
-- [ ] Clip-path reveal on all section entrances (GSAP ScrollTrigger)
+- [ ] Clip-path reveal coverage audit on all homepage section entrances
 
 ---
 
@@ -108,6 +109,8 @@
 ---
 
 ## QA
+- [x] Lint passes after latest homepage changes
+- [x] Production build passes after latest homepage changes
 - [ ] Mobile QA at 375px on all scroll effects (real device)
 - [ ] Console errors clean (Browser MCP)
 - [ ] Video loads desktop / falls back mobile
