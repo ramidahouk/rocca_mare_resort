@@ -1,40 +1,152 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-const NAV_LINKS = [
+const HERO_LINKS = [
   { href: "/rooms", label: "Rooms" },
   { href: "/experience", label: "Experience" },
   { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
 ];
 
+const OVERLAY_LINKS_LEFT = [
+  { href: "/rooms", label: "Rooms" },
+  { href: "/experience", label: "Experience" },
+  { href: "/gallery", label: "Gallery" },
+];
+
+const OVERLAY_LINKS_RIGHT = [
+  { href: "/contact", label: "Reserve" },
+  { href: "/contact", label: "Contact" },
+];
+
 export default function Nav() {
-  const navRef = useRef<HTMLElement>(null);
-  const [isFilled, setIsFilled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [pastHero, setPastHero] = useState(false);
+  const [autoHideArmed, setAutoHideArmed] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkNav, setIsDarkNav] = useState(false);
 
   useEffect(() => {
-    if (!navRef.current) return;
+    gsap.registerPlugin(ScrollTrigger);
 
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        start: () => window.innerHeight * 0.15,
+    let lastScrollY = window.scrollY;
+    let downwardAccumulator = 0;
+    const HIDE_THRESHOLD = 200;
+    const REVEAL_DELTA = 5;
+    const resetFrame = window.requestAnimationFrame(() => {
+      setPastHero(window.scrollY > window.innerHeight * 0.85);
+      setAutoHideArmed(false);
+      setIsHidden(false);
+    });
+
+    const heroTrigger = ScrollTrigger.create({
+      start: () => window.innerHeight * 0.85,
+      end: "max",
+      onEnter: () => setPastHero(true),
+      onLeaveBack: () => {
+        setPastHero(false);
+        setIsHidden(false);
+      },
+    });
+
+    const introSection = document.querySelector(".home-intro-outer");
+    let autoHideTrigger: ScrollTrigger | undefined;
+
+    if (isHome && introSection) {
+      autoHideTrigger = ScrollTrigger.create({
+        trigger: introSection,
+        start: "bottom top",
         end: "max",
-        onEnter: () => setIsFilled(true),
-        onLeaveBack: () => setIsFilled(false),
-      });
-    }, navRef);
+        onEnter: () => setAutoHideArmed(true),
+        onLeaveBack: () => {
+          setAutoHideArmed(false);
+          setIsHidden(false);
+        },
+        onUpdate: (self) => {
+          const currentY = window.scrollY;
+          const delta = currentY - lastScrollY;
+          lastScrollY = currentY;
 
-    return () => ctx.revert();
-  }, []);
+          if (!self.isActive) return;
+
+          if (delta > 0) {
+            downwardAccumulator += delta;
+            if (downwardAccumulator > HIDE_THRESHOLD) {
+              setIsHidden(true);
+            }
+          } else if (delta < -REVEAL_DELTA) {
+            downwardAccumulator = 0;
+            setIsHidden(false);
+          }
+        },
+      });
+    }
+
+    return () => {
+      window.cancelAnimationFrame(resetFrame);
+      heroTrigger.kill();
+      autoHideTrigger?.kill();
+    };
+  }, [isHome, pathname]);
+
+  useEffect(() => {
+    if (isHome) {
+      const frame = window.requestAnimationFrame(() => setIsDarkNav(false));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const toneTargets = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-nav-tone="dark"]')
+    );
+
+    if (toneTargets.length === 0) {
+      const frame = window.requestAnimationFrame(() => setIsDarkNav(false));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    const activeTargets = new Set<HTMLElement>();
+    const syncTone = () => setIsDarkNav(activeTargets.size > 0);
+
+    const triggers = toneTargets.map((target) =>
+      ScrollTrigger.create({
+        trigger: target,
+        start: "top 96px",
+        end: "bottom 96px",
+        onEnter: () => {
+          activeTargets.add(target);
+          syncTone();
+        },
+        onEnterBack: () => {
+          activeTargets.add(target);
+          syncTone();
+        },
+        onLeave: () => {
+          activeTargets.delete(target);
+          syncTone();
+        },
+        onLeaveBack: () => {
+          activeTargets.delete(target);
+          syncTone();
+        },
+      })
+    );
+
+    ScrollTrigger.refresh();
+
+    return () => {
+      triggers.forEach((trigger) => trigger.kill());
+      activeTargets.clear();
+    };
+  }, [isHome, pathname]);
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -43,45 +155,128 @@ export default function Nav() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isMenuOpen]);
+
+  const heroBarVisible = !pastHero && !isMenuOpen;
+  const pillVisible =
+    pastHero && !isMenuOpen && !(isHome && autoHideArmed && isHidden);
+
+  const allLinks = [...OVERLAY_LINKS_LEFT, ...OVERLAY_LINKS_RIGHT];
+
   return (
     <>
+      {/* Hero horizontal bar */}
       <nav
-        ref={navRef}
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-600 ${
-          isFilled
-            ? "bg-[rgba(250,247,242,0.92)] backdrop-blur-md shadow-[0_1px_0_rgba(5,10,48,0.06)]"
-            : "bg-transparent"
-        }`}
+        className={`nav-hero-bar ${isDarkNav ? "nav-hero-bar-dark" : ""}`}
+        aria-label="Primary"
         style={{
-          transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
+          opacity: heroBarVisible ? 1 : 0,
+          transform: heroBarVisible ? "translateY(0)" : "translateY(-100%)",
+          pointerEvents: heroBarVisible ? "auto" : "none",
         }}
       >
-        <div className="flex h-18 items-center justify-between md:h-22" style={{ paddingInline: "clamp(1.5rem, 4vw, 4rem)" }}>
-          <Link
-            href="/"
-            className={`type-heading transition-colors duration-600 ${
-              isFilled ? "text-navy" : "text-warm-white"
-            }`}
-            style={{
-              fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
-              transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-            }}
-          >
-            Rocca Mare
-          </Link>
+        <Link href="/" className="nav-hero-brand">
+          Rocca Mare
+        </Link>
+        <ul className="nav-hero-links">
+          {HERO_LINKS.map((link) => (
+            <li key={link.href}>
+              <Link href={link.href} className="nav-hero-link">
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Link href="/contact" className="nav-hero-reserve">
+          Reserve
+        </Link>
+      </nav>
 
-          <div className="hidden md:flex items-center gap-10">
-            <ul className="flex items-center gap-8">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
+      {/* Floating Menu pill */}
+      <button
+        type="button"
+        onClick={() => setIsMenuOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={isMenuOpen}
+        className="nav-pill"
+        style={{
+          opacity: pillVisible ? 1 : 0,
+          transform: pillVisible ? "translateY(0)" : "translateY(-150%)",
+          pointerEvents: pillVisible ? "auto" : "none",
+        }}
+      >
+        Menu
+      </button>
+
+      {/* Full-screen overlay */}
+      <div
+        className="nav-overlay"
+        aria-hidden={!isMenuOpen}
+        style={{
+          opacity: isMenuOpen ? 1 : 0,
+          pointerEvents: isMenuOpen ? "auto" : "none",
+        }}
+      >
+        {/* Overlay: own background image + navy tint */}
+        <div className="nav-overlay-bg" aria-hidden="true" />
+
+        {/* Logo top-left */}
+        <Link
+          href="/"
+          onClick={() => setIsMenuOpen(false)}
+          className="nav-overlay-brand"
+          style={{
+            opacity: isMenuOpen ? 1 : 0,
+            transform: isMenuOpen ? "translateY(0)" : "translateY(-10px)",
+            transition: `opacity 500ms cubic-bezier(0.76, 0, 0.24, 1) 80ms,
+                         transform 500ms cubic-bezier(0.76, 0, 0.24, 1) 80ms`,
+          }}
+        >
+          Rocca Mare
+        </Link>
+
+        {/* Close button top-right */}
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen(false)}
+          aria-label="Close menu"
+          className="nav-overlay-close"
+        >
+          Close
+        </button>
+
+        {/* Two-column link grid — centered vertically */}
+        <nav className="nav-overlay-inner" aria-label="Primary">
+          <div className="nav-overlay-columns">
+            {/* Left column */}
+            <ul className="nav-overlay-col">
+              {OVERLAY_LINKS_LEFT.map((link, i) => (
+                <li
+                  key={link.label}
+                  style={{
+                    transform: isMenuOpen ? "translateY(0)" : "translateY(24px)",
+                    opacity: isMenuOpen ? 1 : 0,
+                    transition: `transform 700ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                      isMenuOpen ? 120 + i * 90 : 0
+                    }ms, opacity 700ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                      isMenuOpen ? 120 + i * 90 : 0
+                    }ms`,
+                  }}
+                >
+                  <span className="nav-overlay-index">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   <Link
                     href={link.href}
-                    className={`type-label nav-link transition-colors duration-600 ${
-                      isFilled ? "text-navy" : "text-warm-white"
-                    }`}
-                    style={{
-                      transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-                    }}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="nav-overlay-link"
                   >
                     {link.label}
                   </Link>
@@ -89,94 +284,57 @@ export default function Nav() {
               ))}
             </ul>
 
-            <Link href="/contact" className="btn-primary">
-              Reserve
-            </Link>
+            {/* Right column */}
+            <ul className="nav-overlay-col">
+              {OVERLAY_LINKS_RIGHT.map((link, i) => (
+                <li
+                  key={link.label}
+                  style={{
+                    transform: isMenuOpen ? "translateY(0)" : "translateY(24px)",
+                    opacity: isMenuOpen ? 1 : 0,
+                    transition: `transform 700ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                      isMenuOpen ? 120 + (OVERLAY_LINKS_LEFT.length + i) * 90 : 0
+                    }ms, opacity 700ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                      isMenuOpen ? 120 + (OVERLAY_LINKS_LEFT.length + i) * 90 : 0
+                    }ms`,
+                  }}
+                >
+                  <span className="nav-overlay-index">
+                    {String(OVERLAY_LINKS_LEFT.length + i + 1).padStart(2, "0")}
+                  </span>
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="nav-overlay-link"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <button
-            type="button"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`flex h-8 w-8 flex-col items-center justify-center gap-1.5 transition-colors duration-600 md:hidden ${
-              isFilled || isMenuOpen ? "text-navy" : "text-warm-white"
-            }`}
+          {/* Contact info bottom-left */}
+          <div
+            className="nav-overlay-contact"
             style={{
-              transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-            }}
-          >
-            <span
-              className="block h-px w-6 bg-current transition-transform duration-300"
-              style={{
-                transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-                transform: isMenuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
-              }}
-            />
-            <span
-              className="block h-px w-6 bg-current transition-transform duration-300"
-              style={{
-                transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-                transform: isMenuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
-              }}
-            />
-          </button>
-        </div>
-      </nav>
-
-      <div
-        className={`fixed inset-0 z-40 transition-opacity duration-600 md:hidden ${
-          isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        style={{
-          backgroundColor: "#FAF7F2",
-          transitionTimingFunction: "cubic-bezier(0.76, 0, 0.24, 1)",
-        }}
-      >
-        <div className="flex flex-col justify-center h-full pt-18" style={{ paddingInline: "clamp(1.5rem, 4vw, 4rem)" }}>
-          <ul className="flex flex-col gap-8">
-            {NAV_LINKS.map((link, i) => (
-              <li
-                key={link.href}
-                style={{
-                  transform: isMenuOpen ? "translateY(0)" : "translateY(20px)",
-                  opacity: isMenuOpen ? 1 : 0,
-                  transition: `transform 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
-                    isMenuOpen ? 100 + i * 80 : 0
-                  }ms, opacity 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
-                    isMenuOpen ? 100 + i * 80 : 0
-                  }ms`,
-                }}
-              >
-                <Link
-                  href={link.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="type-display block text-navy"
-                  style={{ fontSize: "clamp(2.5rem, 8vw, 4rem)" }}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            href="/contact"
-            onClick={() => setIsMenuOpen(false)}
-            className="btn-primary mt-12 self-start"
-            style={{
-              transform: isMenuOpen ? "translateY(0)" : "translateY(20px)",
               opacity: isMenuOpen ? 1 : 0,
-              transition: `transform 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
-                isMenuOpen ? 100 + NAV_LINKS.length * 80 : 0
-              }ms, opacity 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
-                isMenuOpen ? 100 + NAV_LINKS.length * 80 : 0
+              transform: isMenuOpen ? "translateY(0)" : "translateY(12px)",
+              transition: `opacity 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                isMenuOpen ? 120 + allLinks.length * 90 : 0
+              }ms, transform 600ms cubic-bezier(0.76, 0, 0.24, 1) ${
+                isMenuOpen ? 120 + allLinks.length * 90 : 0
               }ms`,
             }}
           >
-            Reserve
-          </Link>
-        </div>
+            <a href="tel:+33000000000" className="nav-overlay-contact-link">
+              +33 0 00 00 00 00
+            </a>
+            <a href="mailto:hello@roccamare.com" className="nav-overlay-contact-link">
+              hello@roccamare.com
+            </a>
+          </div>
+        </nav>
       </div>
     </>
   );

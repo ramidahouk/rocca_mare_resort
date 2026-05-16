@@ -9,17 +9,17 @@ const EXPERIENCES = [
   {
     label: "Pool",
     descriptor: "Still water. Warm stone.",
-    image: "https://picsum.photos/1200/1800?random=5",
+    image: "/images/Pool.jpeg",
   },
   {
     label: "Beach",
     descriptor: "Salt air. Slow afternoons.",
-    image: "https://picsum.photos/1200/1800?random=6",
+    image: "/images/Beach.jpeg",
   },
   {
     label: "Dining",
     descriptor: "Tables held by dusk.",
-    image: "https://picsum.photos/1200/1800?random=7",
+    image: "/images/Dining.jpeg",
   },
 ];
 

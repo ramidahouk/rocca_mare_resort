@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Footer from "@/components/Footer";
 import GSAPInit from "@/components/GSAPInit";
 import Nav from "@/components/Nav";
 
@@ -38,6 +39,7 @@ export default function RootLayout({
         <GSAPInit />
         <Nav />
         {children}
+        <Footer />
       </body>
     </html>
   );

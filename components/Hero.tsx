@@ -107,6 +107,22 @@ export default function Hero() {
       />
 
       <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "160px",
+          background:
+            "linear-gradient(to bottom, rgba(5, 10, 48, 0.32) 0%, rgba(5, 10, 48, 0.1) 60%, rgba(5, 10, 48, 0) 100%)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+
+      <div
         className="hero-content"
         style={{
           position: "relative",

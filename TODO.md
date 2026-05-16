@@ -26,12 +26,40 @@
 ---
 
 ## Nav
-- [x] Build Nav component — fixed, transparent over hero
-- [x] Scroll: fills to `rgba(250,247,242,0.92)` + `backdrop-filter: blur(12px)` (GSAP ScrollTrigger)
-- [x] Logo: "Rocca Mare" — Recoleta 400, navy
-- [x] Links: DM Sans 400, navy, wave underline on hover
-- [x] CTA: "Reserve" — pill, navy bg, warm-white text
-- [x] Mobile: hamburger menu
+- [x] Build Nav v1 component — fixed, transparent over hero (replaced by v2)
+- [x] Scroll: fills to `rgba(250,247,242,0.92)` + `backdrop-filter: blur(12px)` (GSAP ScrollTrigger) (replaced by v2)
+- [x] Logo: "Rocca Mare" — Recoleta 400, navy (replaced by v2)
+- [x] Links: DM Sans 400, navy, wave underline on hover (replaced by v2)
+- [x] CTA: "Reserve" — pill, navy bg, warm-white text (replaced by v2)
+- [x] Mobile: hamburger menu (replaced by v2)
+
+### Nav v2 — single floating Menu pill, experience-first
+- [x] Pill visible from page load (no hero scroll trigger — pill always present)
+- [x] Pill: navy bg, warm-white text, `Menu` label DM Sans 500 uppercase, btn-primary styling
+- [x] Auto-hide arms after intro section bottom passes viewport top; hides on 200px downward scroll, reveals on any scroll-up >5px
+- [x] Full-screen menu overlay: warm-white bg, stacked links Recoleta display, staggered reveal
+- [x] Reserve sits as equal-weight link in overlay (no separate Reserve pill — experience-first)
+- [x] Contact info bottom corner of overlay (phone, email)
+- [x] Close button replaces pill position when overlay open
+- [x] Body scroll lock while overlay open
+- [x] Same behavior mobile + desktop, no split
+
+### Nav v3 — hero bar over hero, pill past hero (DECIDED)
+- [x] Horizontal nav bar over hero — wordmark left, page links center-right, Reserve outline pill right
+- [x] Warm-white text, no background fill at first paint (sits over video)
+- [x] Hand-off at 0.85 × viewport height: bar fades up out, Menu pill fades down in
+- [x] Past hero: pill governs, auto-hide arms after intro section, hide-on-down / reveal-on-up
+- [x] Mobile: hide hero links below 720px (wordmark + Reserve only), pill takes over after hero
+
+### Nav — resolved issues
+- [x] Menu overlay tint appeared navy despite `rgba(15,12,8,0.72)` — resolved by hard refresh (dev server CSS cache). No code change needed.
+
+---
+
+## Footer
+- [x] Shared footer added to root layout
+- [x] Footer uses dark section palette: navy background, warm-white text, beige accents
+- [x] Includes brand line, section links, reserve contact, location note, and bottom booking link
 
 ---
 
@@ -61,36 +89,63 @@
 ### Remaining sections
 - [x] Intro text — split layout (image bleed left, text right), clip-path stagger + image parallax
 - [x] Intro bleed image — replaced Picsum with local optimized `public/images/intro-bleed.webp` (~432 KB)
-- [x] Current remaining placeholder images via picsum — replace with real assets later
+- [x] Rooms teaser — The Room and The Sea Room replaced with local generated assets (`Room.png`, `Balcony.png`)
+- [x] Rooms teaser — replace The Suite placeholder image with local generated asset (`Suite.jpeg`)
+- [x] Experience teaser — Pool / Beach / Dining replaced with local generated 9:16 assets
 - [x] Rooms teaser — 3-card grid, image + label + descriptor, hover lift + scale, clip-path stagger reveal
 - [x] Rooms teaser — per-card hover tints whole section background (beige / wave / navy), 0.8s premium easing
 - [x] Rooms teaser — hovered/focused card stays full color while sibling cards softly dim and desaturate
 - [x] Experience teaser - full-bleed Pool / Beach / Dining image columns with hover expansion/compression
 - [x] Experience teaser - removed image zoom so column expansion is the sole signature hover effect
-- [ ] Gallery teaser
-- [ ] CTA section (Framer Motion whileInView)
-- [ ] Clip-path reveal coverage audit on all homepage section entrances
+- [x] Experience to Gallery transition - added responsive warm-white breathing gap before gallery
+- [x] Gallery teaser - Option 1 implemented as 4-column cascading parallax:
+  - **Option 1 — 4-column cascading parallax** (`smooth-parallax-scroll` repo) — 4 columns offset at different vertical positions (`-45%`, `-95%`, `-45%`, `-75%`), each scrolling at a different Y speed. `175vh` section, `overflow: hidden`. GSAP ScrollTrigger scrub. Most dimensional, most gallery-native.
+  - Local generated gallery assets wired from `public/images/gallery/` (`1.jpeg` through `12.jpeg`, each used once).
+  - **Option 2 — 3-image variable-speed parallax** (`parallax-scroll` repo) — 3 images at slow/medium/fast speeds (`0→-50`, `0→-150`, `0→-250`). Simpler, more editorial spread. Less dramatic than option 1.
+  - **Option 3 — Perspective section transition** (`perspective-section-transition` repo) — gallery teaser section scales down + rotates as next section slides in underneath. A transition effect, not a layout. Can layer on top of option 1 or 2.
+  - **Option 4 — Canvas video scrub** (`scroll-animation` repo) — images advance frame by frame on canvas as you scroll. Cinematic but needs 60 prerendered frames — not viable without real assets.
+  - **Recommendation note:** Option 3 perspective exit was not added. Current accepted direction is one primary gallery motion only.
+- [x] CTA section - warm-white editorial split, viewport-aware height, Framer Motion `whileInView` opacity + translateY entrance
+- [x] Clip-path reveal coverage audit — all sections confirmed (intro, rooms, experience, gallery, CTA)
+- [x] Fresh homepage visual QA — done
 
 ---
 
 ## Rooms page
-- [ ] Fetch resortkaskady.com before building
-- [ ] Read cursor-tracking repo before building
-- [ ] Three 100vh columns — Rooms / Suites / Pool Villas
-- [ ] Image follows cursor per column (GSAP quickTo, lerp)
-- [ ] Background shifts to faded dominant color on hover
+- [x] resortkaskady.com — fetched in pre-build phase (see Pre-build reading section)
+- [x] Read cursor-tracking repo before building — `How to Make an Animated Cursor using React and GSAP\blend-mode-cursor`
+- [x] Reuse local generated accommodation assets: `Room.png`, `Balcony.png`, `Suite.jpeg`
+- [x] Three 100vh columns — Rooms / Sea Rooms / Suites
+- [x] Cursor-follow variant implemented from reference, then replaced after review with calmer pinned image stage
+- [x] Pinned image stage crossfades per active room column
+- [x] Shared resort-background variant implemented: `menu-bg.png` base, active room image fades in on hover/focus
+- [x] Revised Rooms hover: room image now reveals inside the active column only; shared `menu-bg.png` stays darker behind columns
+- [x] Inner pages keep horizontal nav bar instead of handing off to Menu pill
+- [x] Background shifts to faded dominant color on hover
+- [x] Rooms page accepted signature: shared dark resort background + per-column image reveal
+- [x] Mobile/smaller display fallback adjusted so panel images read cleaner over the shared background
+- [ ] Browser QA Rooms page hover/focus behavior and mobile fallback
 
 ---
 
 ## Experience page
-- [ ] Fetch resortkaskady.com before building
-- [ ] Three full-height columns — Pool / Beach / Dining
-- [ ] Hovered column expands (flex-grow), others compress
-- [ ] Full-bleed image per column
+- [x] resortkaskady.com — fetched in pre-build phase (see Pre-build reading section)
+- [x] Reuse local generated horizontal activity assets: `Horizontal Pool.jpeg`, `Horizontal Beach.jpeg`, `Horizontal dining.jpeg`
+- [x] Chosen page signature: cinematic editorial selector, not homepage column repeat
+- [x] One full-screen background image crossfades by selected experience
+- [x] Selector options: Pool / Beach / Dining with active copy
+- [x] Responsive mobile selector fallback
+- [x] Replaced quiet detail rows with pinned scroll story section from `gsap-scrolltrigger` pinned stack reference
+- [x] Pinned story uses vertical Pool / Beach / Dining assets with stacked clip-path image reveals, synced copy, and progress rails
+- [x] Experience hero background scoped to first viewport only, not the whole page
+- [x] Inner pages now hand off from horizontal nav to floating Menu pill after the first viewport
+- [x] Mobile Experience story changed to normal image/copy cards instead of the desktop pinned story
+- [x] Browser/CDP screenshot QA for Experience page desktop scroll states and mobile fallback
 
 ---
 
 ## Gallery page
+- [ ] Reuse local generated gallery assets from `public/images/gallery/`
 - [ ] Horizontal scroll driven by vertical scroll (GSAP ScrollTrigger + pin)
 - [ ] Full-bleed images only, no radius, no shadow
 
@@ -109,10 +164,16 @@
 ---
 
 ## QA
-- [x] Lint passes after latest homepage changes
-- [x] Production build passes after latest homepage changes
+- [x] Lint passes after latest Experience page changes
+- [x] Production build passes after latest Experience page changes
 - [ ] Mobile QA at 375px on all scroll effects (real device)
 - [ ] Console errors clean (Browser MCP)
 - [ ] Video loads desktop / falls back mobile
 - [ ] Deploy to Vercel early
 - [ ] Lighthouse 90+ on Vercel production
+
+---
+
+## Build decisions log
+
+All resolved decisions (nav model, hero overlay, menu overlay, container model, rooms teaser, gallery library) are documented in `Brief.md → Resolved Build Decisions` and `DESIGN.md`. Read those before implementing anything — do not reopen closed decisions.

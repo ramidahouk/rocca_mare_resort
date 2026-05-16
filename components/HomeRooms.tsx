@@ -9,21 +9,21 @@ const ROOMS = [
   {
     label: "The Room",
     descriptor: "Wakes you with sea light.",
-    image: "https://picsum.photos/800/1000?random=31",
+    image: "/images/Room.png",
     tint: "rgba(201, 164, 136, 0.18)", // beige — warm stone
     href: "/rooms",
   },
   {
-    label: "The Suite",
-    descriptor: "Room to breathe, room to linger.",
-    image: "https://picsum.photos/800/1000?random=32",
+    label: "The Sea Room",
+    descriptor: "Balcony light and water beyond.",
+    image: "/images/Balcony.png",
     tint: "rgba(112, 172, 144, 0.16)", // wave green — water
     href: "/rooms",
   },
   {
-    label: "The Pool Villa",
-    descriptor: "Private water. Private quiet.",
-    image: "https://picsum.photos/800/1000?random=33",
+    label: "The Suite",
+    descriptor: "More space, slower mornings.",
+    image: "/images/Suite.jpeg",
     tint: "rgba(5, 10, 48, 0.06)", // soft navy — depth
     href: "/rooms",
   },
