@@ -8,7 +8,7 @@
 - [x] `globals.css` — all design tokens, utility classes, button styles
 - [x] `layout.tsx` — fonts wired, GSAPInit mounted
 - [x] Page stubs — home, rooms, experience, gallery, contact
-- [ ] Static export config in `next.config.ts` (`output: "export"`) before deployment
+- [x] Static export config in `next.config.ts` (`output: "export"`) — added, build passes
 
 ---
 
@@ -169,18 +169,17 @@
 ---
 
 ## Page transitions
-- [ ] Read page transitions repo before building
-- [ ] Curve or stair wipe — Framer Motion
+- [x] Curve wipe tried (Framer Motion) — removed. App Router doesn't support exit animations cleanly. Site is strong without them.
 
 ---
 
 ## QA
-- [x] Lint passes after latest homepage refinement
-- [x] Production build passes after latest homepage refinement
-- [ ] Mobile QA at 375px on all scroll effects (real device)
-- [ ] Console errors clean (Browser MCP)
-- [ ] Video loads desktop / falls back mobile
-- [ ] Deploy to Vercel early
+- [x] Lint passes
+- [x] Production build passes — all 6 routes static, `output: "export"` confirmed
+- [x] Mobile QA at 375px on all scroll effects (real device)
+- [x] Console errors clean
+- [x] Video loads desktop / falls back mobile
+- [ ] Deploy to Vercel
 - [ ] Lighthouse 90+ on Vercel production
 
 ---
