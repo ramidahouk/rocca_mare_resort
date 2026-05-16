@@ -127,8 +127,8 @@ export default function HomeIntro() {
             className="type-body home-intro-body"
             style={{ color: "#050A30" }}
           >
-            Rooms open to the sea. A pool cut into the rock. Meals on the
-            terrace.
+            A pool cut into stone. Rooms open to the sea. Meals drift across
+            the terrace.
           </p>
 
           <Link

@@ -108,6 +108,8 @@
 - [x] CTA section - warm-white editorial split, viewport-aware height, Framer Motion `whileInView` opacity + translateY entrance
 - [x] Clip-path reveal coverage audit — all sections confirmed (intro, rooms, experience, gallery, CTA)
 - [x] Fresh homepage visual QA — done
+- [x] Homepage refinement pass - Intro given stronger editorial scale, tighter copy, larger image presence
+- [x] Homepage rhythm pass - tightened Intro to Accommodation spacing and delayed homepage Menu pill until the pinned hero is visually past
 
 ---
 
@@ -120,7 +122,7 @@
 - [x] Pinned image stage crossfades per active room column
 - [x] Shared resort-background variant implemented: `menu-bg.png` base, active room image fades in on hover/focus
 - [x] Revised Rooms hover: room image now reveals inside the active column only; shared `menu-bg.png` stays darker behind columns
-- [x] Inner pages keep horizontal nav bar instead of handing off to Menu pill
+- [x] Inner pages use horizontal nav for the first viewport, then hand off to floating Menu pill after scroll
 - [x] Background shifts to faded dominant color on hover
 - [x] Rooms page accepted signature: shared dark resort background + per-column image reveal
 - [x] Mobile/smaller display fallback adjusted so panel images read cleaner over the shared background
@@ -145,15 +147,24 @@
 ---
 
 ## Gallery page
-- [ ] Reuse local generated gallery assets from `public/images/gallery/`
-- [ ] Horizontal scroll driven by vertical scroll (GSAP ScrollTrigger + pin)
-- [ ] Full-bleed images only, no radius, no shadow
+- [x] Reuse local generated gallery assets from `public/images/gallery/`
+- [x] Asset audit: all gallery images are vertical `896x1200` (`3:4`), so fullscreen desktop cover would over-crop
+- [x] Chosen layout: editorial horizontal gallery using vertical image compositions, not forced fullscreen cover
+- [x] Horizontal scroll driven by vertical scroll (GSAP ScrollTrigger + pin) on desktop
+- [x] Mobile fallback: vertical editorial stack
+- [x] Removed guessed/descriptive per-image labels; keep neutral counter/branding only
+- [x] Gallery page uses `data-nav-tone="dark"` so nav stays readable over warm-white editorial background
+- [x] Gallery keeps horizontal navbar throughout; it does not hand off to Menu pill
+- [x] Gallery frames sized by viewport height while preserving the vertical `3:4` ratio
+- [x] Rebuilt to full-bleed full-height panels — each image fills 100vh, width follows natural aspect ratio, no background peeking, count label overlaid bottom-left
 
 ---
 
 ## Contact / Reserve page
-- [ ] Simple form + location
-- [ ] No effects
+- [x] Split layout — form left, location/info right
+- [x] Full-bleed map at bottom (`map.jpg`, object-position 35% to frame coastline)
+- [x] Nav dark tone wired via `data-nav-tone="dark"`
+- [x] Mobile: pill replaces Reserve in hero bar on inner pages
 
 ---
 
@@ -164,8 +175,8 @@
 ---
 
 ## QA
-- [x] Lint passes after latest Experience page changes
-- [x] Production build passes after latest Experience page changes
+- [x] Lint passes after latest homepage refinement
+- [x] Production build passes after latest homepage refinement
 - [ ] Mobile QA at 375px on all scroll effects (real device)
 - [ ] Console errors clean (Browser MCP)
 - [ ] Video loads desktop / falls back mobile

@@ -27,6 +27,7 @@ const OVERLAY_LINKS_RIGHT = [
 export default function Nav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isGallery = pathname === "/gallery";
   const [pastHero, setPastHero] = useState(false);
   const [autoHideArmed, setAutoHideArmed] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
@@ -40,14 +41,15 @@ export default function Nav() {
     let downwardAccumulator = 0;
     const HIDE_THRESHOLD = 200;
     const REVEAL_DELTA = 5;
+    const heroHandoffMultiplier = isHome ? 1.55 : 0.85;
     const resetFrame = window.requestAnimationFrame(() => {
-      setPastHero(window.scrollY > window.innerHeight * 0.85);
+      setPastHero(window.scrollY > window.innerHeight * heroHandoffMultiplier);
       setAutoHideArmed(false);
       setIsHidden(false);
     });
 
     const heroTrigger = ScrollTrigger.create({
-      start: () => window.innerHeight * 0.85,
+      start: () => window.innerHeight * heroHandoffMultiplier,
       end: "max",
       onEnter: () => setPastHero(true),
       onLeaveBack: () => {
@@ -164,9 +166,12 @@ export default function Nav() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [isMenuOpen]);
 
-  const heroBarVisible = !pastHero && !isMenuOpen;
+  const heroBarVisible = (isGallery || !pastHero) && !isMenuOpen;
   const pillVisible =
-    pastHero && !isMenuOpen && !(isHome && autoHideArmed && isHidden);
+    !isGallery &&
+    !isMenuOpen &&
+    !(isHome && autoHideArmed && isHidden) &&
+    (pastHero || !isHome);
 
   const allLinks = [...OVERLAY_LINKS_LEFT, ...OVERLAY_LINKS_RIGHT];
 
@@ -174,7 +179,7 @@ export default function Nav() {
     <>
       {/* Hero horizontal bar */}
       <nav
-        className={`nav-hero-bar ${isDarkNav ? "nav-hero-bar-dark" : ""}`}
+        className={`nav-hero-bar ${isDarkNav ? "nav-hero-bar-dark" : ""} ${!isHome && !pastHero ? "nav-hero-bar-has-pill" : ""}`}
         aria-label="Primary"
         style={{
           opacity: heroBarVisible ? 1 : 0,
@@ -205,10 +210,9 @@ export default function Nav() {
         onClick={() => setIsMenuOpen(true)}
         aria-label="Open menu"
         aria-expanded={isMenuOpen}
-        className="nav-pill"
+        className={`nav-pill ${!isHome && !pastHero ? "nav-pill-inner-mobile" : ""}`}
         style={{
           opacity: pillVisible ? 1 : 0,
-          transform: pillVisible ? "translateY(0)" : "translateY(-150%)",
           pointerEvents: pillVisible ? "auto" : "none",
         }}
       >
